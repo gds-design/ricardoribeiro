@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { supabase } from "@/lib/supabaseClient";
 
 export interface FormField {
   id: string;
@@ -158,13 +159,68 @@ export const DBProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   const [books, setBooks] = useState<BookItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Initialize DB from localStorage (single source of truth fallback)
+  // Initialize DB from localStorage (single source of truth fallback) and load from Supabase
   useEffect(() => {
+    async function loadSupabaseData() {
+      try {
+        // Load Settings
+        const { data: setD } = await supabase.from("mr_settings").select("*");
+        if (setD && setD.length > 0) {
+          const parsed = setD[0];
+          const newSettings = {
+            whatsapp_number: parsed.whatsapp_number,
+            email: parsed.email,
+            youtube_video_url: parsed.youtube_video_url,
+            presentation_text: parsed.presentation_text
+          };
+          setSettings(newSettings);
+          localStorage.setItem("mr_settings", JSON.stringify(newSettings));
+        }
+
+        // Load Books
+        const { data: bD } = await supabase.from("mr_books").select("*").order("title", { ascending: true });
+        if (bD && bD.length >= 12) {
+          setBooks(bD);
+          localStorage.setItem("mr_books", JSON.stringify(bD));
+        }
+
+        // Load Events
+        const { data: eD } = await supabase.from("mr_events").select("*");
+        if (eD) {
+          setEvents(eD);
+          localStorage.setItem("mr_events", JSON.stringify(eD));
+        }
+
+        // Load Orders
+        const { data: oD } = await supabase.from("mr_orders").select("*");
+        if (oD) {
+          setOrders(oD);
+          localStorage.setItem("mr_orders", JSON.stringify(oD));
+        }
+
+        // Load Templates
+        const { data: tD } = await supabase.from("mr_form_templates").select("*");
+        if (tD && tD.length > 0) {
+          const formatted = tD.map((item: any) => ({
+            id: item.id,
+            fields: Array.isArray(item.fields) ? item.fields : JSON.parse(item.fields)
+          }));
+          setFormTemplates(formatted);
+          localStorage.setItem("mr_templates", JSON.stringify(formatted));
+        }
+      } catch (err) {
+        console.warn("Supabase fetch failed, falling back to local storage.", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
     if (typeof window !== "undefined") {
       const storedOrders = localStorage.getItem("mr_orders");
       const storedTemplates = localStorage.getItem("mr_templates");
       const storedEvents = localStorage.getItem("mr_events");
       const storedSettings = localStorage.getItem("mr_settings");
+      const storedBooks = localStorage.getItem("mr_books");
 
       if (storedOrders) {
         try { setOrders(JSON.parse(storedOrders)); } catch (e) {}
@@ -194,7 +250,7 @@ export const DBProvider: React.FC<{ children: React.ReactNode }> = ({ children }
               "Fale brevemente sobre sua motivação para este Mapa Profético": "Gostaria de entender melhor a direção ministerial para a minha família."
             },
             created_at: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
-            due_date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() // Atrasado
+            due_date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString()
           },
           {
             id: "ord-3",
@@ -235,7 +291,6 @@ export const DBProvider: React.FC<{ children: React.ReactNode }> = ({ children }
         localStorage.setItem("mr_settings", JSON.stringify(defaultSettings));
       }
 
-      const storedBooks = localStorage.getItem("mr_books");
       if (storedBooks) {
         try { 
           const parsed = JSON.parse(storedBooks);
@@ -254,7 +309,8 @@ export const DBProvider: React.FC<{ children: React.ReactNode }> = ({ children }
         localStorage.setItem("mr_books", JSON.stringify(defaultBooks));
       }
 
-      setIsLoading(false);
+      // Sync from Supabase
+      loadSupabaseData();
     }
   }, []);
 
@@ -273,7 +329,6 @@ export const DBProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   const createOrder = (orderData: Omit<Order, "id" | "created_at" | "due_date">) => {
     const id = "ord-" + Math.random().toString(36).substring(2, 9);
     const created_at = new Date().toISOString();
-    // Default deadline: 7 days
     const due_date = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
     
     const newOrder: Order = {
@@ -284,23 +339,44 @@ export const DBProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     };
 
     saveOrders([...orders, newOrder]);
+
+    // Supabase background sync
+    supabase.from("mr_orders").insert([newOrder]).then(({ error }) => {
+      if (error) console.error("Error syncing createOrder to Supabase:", error);
+    });
+
     return newOrder;
   };
 
   const updateOrder = (id: string, updates: Partial<Order>) => {
     const updated = orders.map((o) => (o.id === id ? { ...o, ...updates } : o));
     saveOrders(updated);
+
+    // Supabase background sync
+    supabase.from("mr_orders").update(updates).eq("id", id).then(({ error }) => {
+      if (error) console.error("Error syncing updateOrder to Supabase:", error);
+    });
   };
 
   const deleteOrder = (id: string) => {
     const updated = orders.filter((o) => o.id !== id);
     saveOrders(updated);
+
+    // Supabase background sync
+    supabase.from("mr_orders").delete().eq("id", id).then(({ error }) => {
+      if (error) console.error("Error syncing deleteOrder to Supabase:", error);
+    });
   };
 
   const saveFormTemplate = (plan: "standard" | "premium", fields: FormField[]) => {
     const updated = formTemplates.map((t) => (t.id === plan ? { ...t, fields } : t));
     setFormTemplates(updated);
     localStorage.setItem("mr_templates", JSON.stringify(updated));
+
+    // Supabase background sync
+    supabase.from("mr_form_templates").upsert([{ id: plan, fields }]).then(({ error }) => {
+      if (error) console.error("Error syncing saveFormTemplate to Supabase:", error);
+    });
   };
 
   const createEvent = (evtData: Omit<EventItem, "id">) => {
@@ -308,22 +384,42 @@ export const DBProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     const newEvent: EventItem = { ...evtData, id };
     const updated = [...events, newEvent];
     saveEvents(updated);
+
+    // Supabase background sync
+    supabase.from("mr_events").insert([newEvent]).then(({ error }) => {
+      if (error) console.error("Error syncing createEvent to Supabase:", error);
+    });
   };
 
   const updateEvent = (id: string, updates: Partial<EventItem>) => {
     const updated = events.map((e) => (e.id === id ? { ...e, ...updates } : e));
     saveEvents(updated);
+
+    // Supabase background sync
+    supabase.from("mr_events").update(updates).eq("id", id).then(({ error }) => {
+      if (error) console.error("Error syncing updateEvent to Supabase:", error);
+    });
   };
 
   const deleteEvent = (id: string) => {
     const updated = events.filter((e) => e.id !== id);
     saveEvents(updated);
+
+    // Supabase background sync
+    supabase.from("mr_events").delete().eq("id", id).then(({ error }) => {
+      if (error) console.error("Error syncing deleteEvent to Supabase:", error);
+    });
   };
 
   const updateSettings = (updates: Partial<GlobalSettings>) => {
     const updated = { ...settings, ...updates };
     setSettings(updated);
     localStorage.setItem("mr_settings", JSON.stringify(updated));
+
+    // Supabase background sync
+    supabase.from("mr_settings").upsert([{ id: 1, ...updated }]).then(({ error }) => {
+      if (error) console.error("Error syncing updateSettings to Supabase:", error);
+    });
   };
 
   const saveBooks = (updated: BookItem[]) => {
@@ -334,6 +430,11 @@ export const DBProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   const updateBook = (id: string, updates: Partial<BookItem>) => {
     const updated = books.map((b) => (b.id === id ? { ...b, ...updates } : b));
     saveBooks(updated);
+
+    // Supabase background sync
+    supabase.from("mr_books").update(updates).eq("id", id).then(({ error }) => {
+      if (error) console.error("Error syncing updateBook to Supabase:", error);
+    });
   };
 
   const createBook = (bookData: Omit<BookItem, "id">) => {
@@ -341,11 +442,21 @@ export const DBProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     const newBook: BookItem = { ...bookData, id };
     const updated = [...books, newBook];
     saveBooks(updated);
+
+    // Supabase background sync
+    supabase.from("mr_books").insert([newBook]).then(({ error }) => {
+      if (error) console.error("Error syncing createBook to Supabase:", error);
+    });
   };
 
   const deleteBook = (id: string) => {
     const updated = books.filter((b) => b.id !== id);
     saveBooks(updated);
+
+    // Supabase background sync
+    supabase.from("mr_books").delete().eq("id", id).then(({ error }) => {
+      if (error) console.error("Error syncing deleteBook to Supabase:", error);
+    });
   };
 
   return (

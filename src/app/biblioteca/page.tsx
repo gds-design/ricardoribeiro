@@ -298,9 +298,9 @@ export default function BibliotecaCompletaPage() {
               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-slate-950 text-amber-500 text-[9px] font-black uppercase tracking-wider rounded-md">
                 🔥 Mega Oportunidade
               </span>
-              <h2 className="text-2xl sm:text-3xl font-black tracking-tight uppercase leading-none">PACOTE COM TODOS OS {displayBooks.length} EBOOKS</h2>
-              <p className="text-xs font-bold text-slate-905 max-w-lg leading-relaxed">
-                Garanta o acervo completo do Apóstolo Ricardo Ribeiro. Adquiridos individualmente, sairiam R$ 600 reais. Com o combo de uma só vez, leve com <strong className="font-extrabold text-slate-950">50% de DESCONTO</strong>!
+              <h2 className="text-2xl sm:text-3xl font-black tracking-tight uppercase leading-none text-white">PACOTE COM TODOS OS {displayBooks.length} EBOOKS</h2>
+              <p className="text-xs font-bold text-white/90 max-w-lg leading-relaxed">
+                Garanta o acervo completo do Apóstolo Ricardo Ribeiro. Adquiridos individualmente, sairiam R$ 600 reais. Com o combo de uma só vez, leve com <strong className="font-extrabold text-white">50% de DESCONTO</strong>!
               </p>
             </div>
 
@@ -374,7 +374,7 @@ export default function BibliotecaCompletaPage() {
                       {book.coverUrl.startsWith("from-") ? (
                         <div className={`absolute inset-0 bg-gradient-to-br ${book.coverGradient} opacity-95`} />
                       ) : (
-                        <img src={book.coverUrl} alt={book.title} className="absolute inset-0 w-full h-full object-cover opacity-95" />
+                        <img src={book.coverUrl} alt={book.title} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover opacity-95" />
                       )}
                       
                       {/* Book spine simulation overlay */}

@@ -39,7 +39,7 @@ export default function RootLayout({
         <link
           rel="preload"
           as="image"
-          href="/hero-portrait-v7.png"
+          href="/hero-portrait-v7.webp"
           fetchPriority="high"
         />
       </head>

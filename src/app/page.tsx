@@ -140,10 +140,10 @@ export default function Home() {
         {/* Large Portrait Image positioned absolutely */}
         <div className="absolute right-0 bottom-0 top-0 w-full lg:w-[58%] xl:w-[54%] hidden lg:block z-0 pointer-events-none select-none">
           <div className="relative w-full h-full">
-            {/* Smooth transition gradient restricted to the left 35% to avoid reaching the face */}
-            <div className="absolute left-0 top-0 bottom-0 w-[35%] bg-gradient-to-r from-slate-950 via-slate-950/70 to-transparent z-10" />
+            {/* Smooth transition gradient restricted to the left 22% to avoid reaching the face */}
+            <div className="absolute left-0 top-0 bottom-0 w-[22%] bg-gradient-to-r from-slate-950 via-slate-950/50 to-transparent z-10" />
             <Image
-              src="/hero-portrait-v7.png"
+              src="/hero-portrait-v7.webp"
               alt="Apóstolo Ricardo Ribeiro"
               fill
               style={{ objectFit: "cover", objectPosition: "right bottom" }}

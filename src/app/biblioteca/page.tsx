@@ -268,8 +268,8 @@ export default function BibliotecaCompletaPage() {
 
       {/* 1. Hero Section */}
       <section className="relative bg-slate-950 text-white py-16 sm:py-20 overflow-hidden border-b border-slate-900">
-        <div className="absolute inset-0 bg-contain bg-right bg-no-repeat opacity-[0.45]" style={{ backgroundImage: "url('/biblioteca-banner.webp')" }} />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(15,23,42,0.8),#020617)] z-0 pointer-events-none" />
+        <div className="hidden sm:block absolute inset-0 bg-contain bg-right bg-no-repeat opacity-[0.95]" style={{ backgroundImage: "url('/biblioteca-banner.webp')" }} />
+        <div className="hidden sm:block absolute inset-0 z-0 pointer-events-none" style={{ background: "linear-gradient(to right, #020617 0%, #020617 30%, rgba(2,6,23,0.9) 45%, rgba(2,6,23,0) 58%)" }} />
         <div className="absolute left-1/2 -translate-x-1/2 bottom-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center space-y-6">
@@ -278,11 +278,11 @@ export default function BibliotecaCompletaPage() {
             <span>Biblioteca Digital Completa</span>
           </span>
 
-          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight uppercase max-w-4xl mx-auto">
+          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight uppercase max-w-4xl mx-auto drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)]">
             EBOOKS DO <span className="text-brand-gradient">APÓSTOLO RICARDO RIBEIRO</span>
           </h1>
 
-          <p className="text-sm sm:text-base text-slate-350 font-medium leading-relaxed max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base text-slate-200 font-medium leading-relaxed max-w-2xl mx-auto drop-shadow-[0_2px_10px_rgba(0,0,0,0.95)]">
             Aprofunde seus conhecimentos bíblicos, ative seus dons de revelação e alinhe sua caminhada ao tempo profético com os materiais de guerra espiritual e teologia avançada.
           </p>
         </div>
@@ -314,8 +314,8 @@ export default function BibliotecaCompletaPage() {
               <button
                 onClick={handleSelectAll}
                 className={`w-full py-3 px-6 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-350 cursor-pointer ${isComboActive
-                    ? "bg-emerald-600 hover:bg-emerald-500 text-white"
-                    : "bg-brand-gradient text-white hover:scale-[1.03]"
+                  ? "bg-emerald-600 hover:bg-emerald-500 text-white"
+                  : "bg-brand-gradient text-white hover:scale-[1.03]"
                   }`}
               >
                 {isComboActive ? "✓ Pacote Selecionado" : "Selecionar Todos (50% Off)"}
@@ -362,8 +362,8 @@ export default function BibliotecaCompletaPage() {
                   key={book.id}
                   onClick={() => handleToggleSelect(book.id)}
                   className={`bg-slate-50 border rounded-2xl p-4 flex flex-col justify-between cursor-pointer transition-all duration-300 group hover:shadow-md ${isSelected
-                      ? "border-amber-500/80 bg-amber-500/[0.02] shadow-sm shadow-amber-500/5"
-                      : "border-slate-200/60 hover:border-slate-350"
+                    ? "border-amber-500/80 bg-amber-500/[0.02] shadow-sm shadow-amber-500/5"
+                    : "border-slate-200/60 hover:border-slate-350"
                     }`}
                 >
                   <div className="space-y-4">
@@ -413,8 +413,8 @@ export default function BibliotecaCompletaPage() {
                     <button
                       type="button"
                       className={`w-full py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-colors cursor-pointer border-0 ${isSelected
-                          ? "bg-brand-gradient text-white"
-                          : "bg-slate-100 hover:bg-slate-200 text-slate-700"
+                        ? "bg-brand-gradient text-white"
+                        : "bg-slate-100 hover:bg-slate-200 text-slate-700"
                         }`}
                     >
                       {isSelected ? "Selecionado" : "Selecionar E-book"}
@@ -563,10 +563,10 @@ export default function BibliotecaCompletaPage() {
                   onClick={handleSendWhatsApp}
                   disabled={selectedIds.length === 0}
                   className={`w-full py-4.5 rounded-xl font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 border-0 transition-all duration-300 ${selectedIds.length === 0
-                      ? "bg-slate-800 text-slate-500 cursor-not-allowed"
-                      : isComboActive
-                        ? "bg-brand-gradient text-white hover:scale-[1.03]"
-                        : "bg-emerald-600 hover:bg-emerald-500 text-white hover:scale-[1.03]"
+                    ? "bg-slate-800 text-slate-500 cursor-not-allowed"
+                    : isComboActive
+                      ? "bg-brand-gradient text-white hover:scale-[1.03]"
+                      : "bg-emerald-600 hover:bg-emerald-500 text-white hover:scale-[1.03]"
                     }`}
                 >
                   <MessageSquare className={`w-4.5 h-4.5 ${isComboActive ? "fill-white stroke-none" : "fill-white stroke-none"}`} />

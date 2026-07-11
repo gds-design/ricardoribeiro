@@ -38,8 +38,8 @@ export default function Home() {
       tagline: "Paternidade espiritual para uma vida de direção e maturidade.",
       price: "",
       description: "Relacionamento direto e exclusivo com o apóstolo Ricardo através de grupo no whatsapp e ZOOM, para aconselhamento, acompanhamento dos meses e festas bíblicas.",
-      checkout_url: "https://sun.eduzz.com/ecop-capacitacao",
-      details_url: "https://wa.me/5521981116787?text=Olá! Gostaria de obter mais informações sobre a Mentoria e Paternidade Espiritual.",
+      checkout_url: "https://api.whatsapp.com/send/?phone=5521981116787&text=Ol%C3%A1%21+Gostaria+de+obter+mais+informa%C3%A7%C3%B5es+sobre+a+Mentoria+e+Paternidade+Espiritual.&type=phone_number&app_absent=0",
+      details_url: "",
       is_popular: true
     },
     {
@@ -372,7 +372,7 @@ export default function Home() {
                   )}
 
                   <div className="flex flex-col gap-2">
-                    {course.id !== "crs-2" && (
+                    {course.id !== "crs-2" && course.id !== "crs-1" && (
                       <a
                         href={course.details_url}
                         target="_blank"
@@ -393,7 +393,7 @@ export default function Home() {
                         : "bg-slate-900 hover:bg-slate-800 text-white shadow-sm"
                         }`}
                     >
-                      <span>{course.id === "crs-2" ? "Ver Cursos Disponíveis" : "Matricular-se"}</span>
+                      <span>{course.id === "crs-2" ? "Ver Cursos Disponíveis" : course.id === "crs-1" ? "Saiba Mais" : "Matricular-se"}</span>
                       <ArrowUpRight className="w-4 h-4" />
                     </a>
                   </div>
